@@ -8,3 +8,9 @@ type StockBase struct {
 	Industry string `json:"industry"`
 	Market   string `json:"market"`
 }
+
+type StockInfo struct {
+	StockBase
+	MinDate string `json:"minDate"`
+	MaxDate string `json:"maxDate"`
+}

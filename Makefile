@@ -1,5 +1,8 @@
 
-all: gamblerMarketSync
+all: gambler gamblerDataSync
 
-gamblerMarketSync: src/cmd/marketdata/main.go
-	go build -o ./bin/gambler-market-sync ./src/cmd/marketdata/main.go
+gambler: src/cmd/gambler/main.go
+	go build -o ./bin/gambler ./src/cmd/gambler/main.go
+
+gamblerDataSync: src/cmd/marketdata/main.go
+	go build -o ./bin/gambler-data-sync ./src/cmd/marketdata/main.go

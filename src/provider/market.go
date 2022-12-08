@@ -18,6 +18,8 @@ type TaskAction struct {
 
 func consume(queue <-chan TaskAction, wg *sync.WaitGroup) {
 	defer wg.Done()
+
+	store := &storage.Storage{}
 	for task := range queue {
 
 		// 查询该股票的该天行情
@@ -28,7 +30,7 @@ func consume(queue <-chan TaskAction, wg *sync.WaitGroup) {
 		}
 
 		// 将数据写入磁盘
-		if err = storage.Write(task.Date, task.Code, buffer); err != nil {
+		if err = store.Write(task.Date, task.Code, buffer); err != nil {
 			log.Println("ERROR " + err.Error())
 		}
 	}
