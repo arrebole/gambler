@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"log"
 	"net/http"
 	"strconv"
@@ -28,31 +27,34 @@ func main() {
 		w.Write(responseBody)
 	})
 
-	// 查询股票的逐笔交易
-	http.HandleFunc("/ticks", func(w http.ResponseWriter, r *http.Request) {
+	// 查询股票的k线
+	// begin、latest 使用 unix 时间精确到秒
+	http.HandleFunc("/klines", func(w http.ResponseWriter, r *http.Request) {
 		var (
-			code     = r.URL.Query().Get("code")
-			begin, _ = strconv.Atoi(r.URL.Query().Get("begin"))
-			end, _   = strconv.Atoi(r.URL.Query().Get("end"))
+			code      = r.URL.Query().Get("code")
+			level     = r.URL.Query().Get("level")
+			begin, _  = strconv.Atoi(r.URL.Query().Get("begin"))
+			latest, _ = strconv.Atoi(r.URL.Query().Get("latest"))
 		)
 
-		if code == "" || begin == 0 || end == 0 {
-			panic(errors.New("缺失必须的参数"))
-		}
-
 		store := &storage.Storage{}
-		orders, err := store.GetFilesTicks(code, begin, end)
+		klines, err := store.GetKlines(code, level, begin, latest)
 		if err != nil {
 			panic(err.Error())
 		}
 
-		responseBody, err := json.Marshal(orders)
+		responseBody, err := json.Marshal(klines)
 		if err != nil {
 			panic(err.Error())
 		}
 
 		w.Write(responseBody)
 	})
+
+	// 静态文件服务器
+	http.Handle("/", http.FileServer(
+		http.Dir("./webapp/dist"),
+	))
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
