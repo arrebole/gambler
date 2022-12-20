@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"time"
 
 	"github.com/arrebole/gambler/src/constants"
 	"github.com/arrebole/gambler/src/stock"
@@ -29,23 +28,7 @@ func (p Storage) geDayKlineData(code string, date int) ([]float64, error) {
 	if err = json.Unmarshal(buffer, &dailyTicks); err != nil {
 		return nil, err
 	}
-
-	dateTime, _ := time.ParseInLocation(
-		"20060102",
-		fmt.Sprint(dailyTicks.Date),
-		time.Local,
-	)
-
-	result := []float64{
-		float64(dateTime.Unix()),
-		dailyTicks.Day.Open,
-		dailyTicks.Deal.Price[len(dailyTicks.Deal.Price)-1],
-		lo.Max(dailyTicks.Deal.Price),
-		lo.Min(dailyTicks.Deal.Price),
-		float64(lo.Sum(dailyTicks.Deal.Vol)),
-	}
-
-	return result, nil
+	return dailyTicks.GetDayKline(), nil
 }
 
 // getDaysKlinesData 查询指定股票的某一天的k线数据
@@ -87,7 +70,6 @@ func (p Storage) GetKlines(code, level string, begin, latest int) ([][]float64, 
 		beginDateFormat, _  = timeDateFormat(beginTime)
 		latestDateFormat, _ = timeDateFormat(latestTime)
 	)
-	fmt.Println(beginDateFormat, latestDateFormat)
 
 	switch level {
 

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"time"
 
 	"github.com/arrebole/gambler/src/stock"
 )
@@ -27,24 +26,7 @@ func (p Storage) getFileTicks(code string, date int) ([][]float64, error) {
 		return nil, err
 	}
 
-	// 写入结果
-	result := make([][]float64, 0)
-	for i := range dailyTicks.Deal.Time {
-		dateString := fmt.Sprintf("%d%06d", date, dailyTicks.Deal.Time[i])
-		dateTime, _ := time.ParseInLocation(
-			"20060102150405",
-			dateString,
-			time.Local,
-		)
-		result = append(result, []float64{
-			float64(dateTime.Unix()),
-			float64(dailyTicks.Deal.Price[i]),
-			float64(dailyTicks.Deal.Vol[i]),
-			float64(dailyTicks.Deal.Amount[i]),
-			float64(dailyTicks.Deal.Flag[i]),
-		})
-	}
-	return result, nil
+	return dailyTicks.GetTicks(), nil
 }
 
 // GetFilesTicks 查询指定股票的某段时间的交易订单

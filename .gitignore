@@ -1,4 +1,4 @@
 bin
 data/**/*.json
 !data/index.json
-webapp/node_modules/**
+**/node_modules/**
